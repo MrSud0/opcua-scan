@@ -852,11 +852,11 @@ def iterate_endpoints(endpoints, target_report):
         pretty_log(msg[:-2], lvl="critical" if anonymous_accepted else "")
 
         # Convert certificate in base64 (easier to read in the output file)
-        if target_report:
-            endpoint.ServerCertificate = base64.b64encode(
-                endpoint.ServerCertificate
-            ).decode("utf-8")
-            target_report["endpoints"].append(dataclasses.asdict(endpoint))
+        # if target_report:
+        #     endpoint.ServerCertificate = base64.b64encode(
+        #         endpoint.ServerCertificate
+        #     ).decode("utf-8")
+        #     target_report["endpoints"].append(dataclasses.asdict(endpoint))
 
     pretty_log("-" * 40)
 
