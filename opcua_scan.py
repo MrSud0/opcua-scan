@@ -246,7 +246,6 @@ async def read_data(args):
                lvl="error"
             )
         return False
-    print(str(targets))
 
     # Start scan
     for target in targets:
@@ -266,7 +265,7 @@ async def read_data(args):
 
             endpoints = await get_endpoints(client)
             iterate_endpoints(endpoints, target_report)
-            
+
             if await check_authentication(client, args, target_report):
                 try:
                     await read_server_nodes(client, args, target_report)
@@ -303,7 +302,6 @@ async def write_data(args):
                lvl="error"
             )
         return False
-    print(str(targets))
 
     # Start scan
     for target in targets:
@@ -323,7 +321,7 @@ async def write_data(args):
 
             endpoints = await get_endpoints(client)
             iterate_endpoints(endpoints, target_report)
-            
+
             if await check_authentication(client, args, target_report):
                 try:
                     await write_server_nodes(client, args)
@@ -611,11 +609,12 @@ async def write_server_nodes(client, args):
         try:
             browse_name = await supplied_node.read_browse_name()
             # Value
+            value = "BadAttributeIdInvalid"
             try:
                 value = ua_utils.val_to_string(
                     await supplied_node.read_value(), truncate=True
                 )
-            
+
             except ua.uaerrors._auto.BadAttributeIdInvalid:
                 pass
             except Exception as err:
@@ -643,18 +642,16 @@ async def write_server_nodes(client, args):
 
     data_to_be_written = None
     variant_type = None
-    print(args.data.lower() == 'true')
     # Check if the data is a boolean
     if args.data.lower() == 'true':
-        print('yeah')
         data_to_be_written = True
         variant_type = ua.VariantType.Boolean
     elif args.data.lower() == 'false':
         data_to_be_written = False
         variant_type = ua.VariantType.Boolean
-    
+
     # If not a boolean, check if it's an integer
-    elif args.dtype != None:
+    elif args.dtype is not None:
         data_to_be_written = int(args.data)
 
         if(args.dtype == 'UInt16'):
@@ -852,11 +849,11 @@ def iterate_endpoints(endpoints, target_report):
         pretty_log(msg[:-2], lvl="critical" if anonymous_accepted else "")
 
         # Convert certificate in base64 (easier to read in the output file)
-        # if target_report:
-        #     endpoint.ServerCertificate = base64.b64encode(
-        #         endpoint.ServerCertificate
-        #     ).decode("utf-8")
-        #     target_report["endpoints"].append(dataclasses.asdict(endpoint))
+        if target_report:
+            endpoint.ServerCertificate = base64.b64encode(
+                endpoint.ServerCertificate
+            ).decode("utf-8")
+            target_report["endpoints"].append(dataclasses.asdict(endpoint))
 
     pretty_log("-" * 40)
 
@@ -1002,7 +999,6 @@ async def read_node_values(args, root, targets_report_object_tree):
         child_nodes.append(root)
     else:
         child_nodes = await root.get_children()
-        targets_report_object_tree = []
     for child_node in child_nodes:
         
         # Init default attributes
@@ -1475,8 +1471,8 @@ def init_read_data_arg_parser(subparsers):
     )
     parser_read_data.add_argument(
         "--single",
-        help="Read a single address without browsing",
-        default=""
+        action="store_true",
+        help="Read a single address without browsing"
     )
 
 def init_write_data_arg_parser(subparsers):
